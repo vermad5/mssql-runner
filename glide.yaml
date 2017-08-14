@@ -1,0 +1,14 @@
+package: mssql-runner
+import:
+- package: runner
+  repo: ssh://git@pie6.rtp.lab.emc.com/bigd/runner.git
+  ref: develop
+- package: github.com/gin-gonic/gin
+  version: master
+- package: github.com/denisenkom/go-mssqldb
+  version: master
+testImport:
+- package: github.com/onsi/ginkgo
+  version: ^1.2.0
+- package: github.com/onsi/gomega
+  version: ^1.0.0
