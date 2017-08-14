@@ -7,6 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/denisenkom/go-mssqldb"
+	"net/url"
+	"strconv"
 )
 
 type MssqlRunner struct{}
@@ -34,22 +36,38 @@ func parameters() []SpaceAgentRunnerParameter {
 
 func (m MssqlRunner) Handler(c *gin.Context) {
 	host := c.PostForm("host")
-	port := c.PostForm("port")
+	port,err := strconv.Atoi(c.PostForm("port"))
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	databaseName := c.PostForm("databaseName")
 
-	result := mssqlAudit(host, port, username, password, databaseName, "5s")
-	c.JSON(200, gin.H{
-		"canConnect":      result == "",
-		"connectionError": result,
-	})
+    if err == nil {
+		result := mssqlAudit(host, username, password, databaseName, "5s", port)
+		c.JSON(200, gin.H{
+			"canConnect":      result == "",
+			"connectionError": result,
+		})
+	}
+
+	if err != nil{
+		fmt.Println("Error caught")
+	}
 }
 
-func mssqlAudit(host, port, username, password, databaseName, timeout string) string {
+func mssqlAudit(host, username, password, databaseName, timeout string, port int) string {
 	//"sqlserver://demouser1:root@10.30.233.100:1433?database=master&connection+timeout=30"
-	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?readTimeout=%s", username, password, host, port, databaseName, timeout)
-	fmt.Println(connectionString)
+	query := url.Values{}
+	query.Add("database", fmt.Sprintf("%s", databaseName))
+	query.Add("connection timeout", fmt.Sprintf("%d", 15))
+
+	u := &url.URL{
+		Scheme:   "sqlserver",
+		User:     url.UserPassword(username, password),
+		Host:     fmt.Sprintf("%s:%d", host, port),
+		RawQuery: query.Encode(),
+	}
+
+	connectionString := u.String()
 	db, openError := sql.Open("mssql", connectionString)
 
 	if openError != nil {
