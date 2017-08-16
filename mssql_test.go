@@ -42,11 +42,11 @@ var _ = Describe("TestRunner", func() {
 			Context("when it can reach the host", func() {
 				It("returns true", func() {
 					var responseBody = DoPost(router, "/mssql_test", map[string]string{
-						"host":         "127.0.0.1",
-						"port":         "3306",
-						"username":     "root",
+						"host":         "localhost",
+						"port":         "1433",
+						"username":     "demouser1",
 						"password":     "root",
-						"databaseName": "space_agent_db",
+						"databaseName": "master",
 					})
 					Expect(responseBody).To(Equal("{\"canConnect\":true,\"connectionError\":\"\"}"))
 				})
@@ -56,10 +56,10 @@ var _ = Describe("TestRunner", func() {
 				It("returns false", func() {
 					var responseBody = DoPost(router, "/mssql_test", map[string]string{
 						"host":         "unknownhost",
-						"port":         "3306",
-						"username":     "root",
+						"port":         "1433",
+						"username":     "demouser1",
 						"password":     "root",
-						"databaseName": "space_agent_db",
+						"databaseName": "master",
 					})
 					Expect(responseBody).To(ContainSubstring("\"canConnect\":false"))
 					Expect(responseBody).NotTo(ContainSubstring("\"connectionError\":\"\""))
@@ -69,11 +69,11 @@ var _ = Describe("TestRunner", func() {
 			Context("when it tries to connect with an incorrect username", func() {
 				It("returns false", func() {
 					var responseBody = DoPost(router, "/mssql_test", map[string]string{
-						"host":         "127.0.0.1",
-						"port":         "3306",
+						"host":         "localhost",
+						"port":         "1433",
 						"username":     "blah",
 						"password":     "root",
-						"databaseName": "space_agent_db",
+						"databaseName": "master",
 					})
 					Expect(responseBody).To(ContainSubstring("\"canConnect\":false"))
 					Expect(responseBody).To(ContainSubstring("Access denied for user"))
@@ -84,11 +84,11 @@ var _ = Describe("TestRunner", func() {
 			Context("when it tries to connect with an incorrect password", func() {
 				It("returns false", func() {
 					var responseBody = DoPost(router, "/mssql_test", map[string]string{
-						"host":         "127.0.0.1",
-						"port":         "3306",
-						"username":     "root",
+						"host":         "localhost",
+						"port":         "1433",
+						"username":     "demouser1",
 						"password":     "blah",
-						"databaseName": "space_agent_db",
+						"databaseName": "master",
 					})
 					Expect(responseBody).To(ContainSubstring("\"canConnect\":false"))
 					Expect(responseBody).To(ContainSubstring("Access denied for user"))
@@ -99,9 +99,9 @@ var _ = Describe("TestRunner", func() {
 			Context("when it tries to connect to a nonexistent database", func() {
 				It("returns false", func() {
 					var responseBody = DoPost(router, "/mssql_test", map[string]string{
-						"host":         "127.0.0.1",
-						"port":         "3306",
-						"username":     "root",
+						"host":         "localhost",
+						"port":         "1433",
+						"username":     "demouser1",
 						"password":     "root",
 						"databaseName": "blah",
 					})
@@ -121,9 +121,9 @@ var _ = Describe("TestRunner", func() {
 
 				It("returns false", func() {
 					var responseBody = DoPost(router, "/mssql_test", map[string]string{
-						"host":         "127.0.0.1",
+						"host":         "localhost",
 						"port":         "3333",
-						"username":     "root",
+						"username":     "demouser1",
 						"password":     "root",
 						"databaseName": "space_agent_db",
 					})
